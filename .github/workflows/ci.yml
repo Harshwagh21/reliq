@@ -1,0 +1,82 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (go ${{ matrix.go }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.26.x", "1.27.x"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Detect packages
+        id: pkgs
+        run: |
+          if [ -n "$(go list ./... 2>/dev/null)" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Vet
+        if: steps.pkgs.outputs.present == 'true'
+        run: go vet ./...
+
+      - name: Test race
+        if: steps.pkgs.outputs.present == 'true'
+        run: go test -race -count=1 ./...
+
+      - name: Skip vet/test (no packages yet)
+        if: steps.pkgs.outputs.present != 'true'
+        run: echo "no packages yet; skipping vet and race tests"
+
+      - name: golangci-lint
+        if: steps.pkgs.outputs.present == 'true'
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.15.0
+
+      - name: govulncheck
+        if: steps.pkgs.outputs.present == 'true'
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
+          govulncheck ./...
+
+      - name: tidy check
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod || {
+            echo "go.mod not tidy; run go mod tidy"
+            exit 1
+          }
+          if [ -f go.sum ]; then
+            git diff --exit-code -- go.sum || {
+              echo "go.sum not tidy; run go mod tidy"
+              exit 1
+            }
+          fi
+
+      - name: Build examples
+        run: |
+          if compgen -G 'examples/*/*.go' > /dev/null; then
+            go build ./examples/...
+          else
+            echo "no example packages yet; skipping"
+          fi

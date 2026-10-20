@@ -1,0 +1,23 @@
+---
+description: RELIQ project rules
+alwaysApply: true
+---
+RELIQ: small stdlib-only Go resilience library. The ONLY spec is docs/DESIGN.md. If code and spec disagree, stop and ask; do not pick.
+
+Rules:
+- Implement only what DESIGN.md says. No extra features, interfaces, builders, options files, or packages.
+- Layout: pkg/resilience core + one package per policy under pkg/. pkg/resilience never imports policy packages. Docs: markdown under `docs/` (no website app in v0.1). Cursor implements only what `docs/DESIGN.md` says; never invents behavior.
+- Every `New` returns `(X, error)`; invalid config wraps `resilience.ErrInvalidConfig`. Constructors never panic. Runtime panics from dependency functions and user callbacks must propagate unchanged. No `Must` constructors or silent numeric defaults.
+- Stdlib only. Go toolchain 1.27.2, go.mod `go 1.26`: no 1.27-only APIs, no generic methods.
+- No goroutines in library code (tests may use them), no global state, no logging, no metrics.
+- Private helpers: only when DESIGN.md or an ADR explicitly authorizes them, and only under `internal/`. No new public packages or exports for helpers. Panic origin is decided: no helper for classifying panic source (see DESIGN).
+- Efficiency bar (non-negotiable): write code as if every byte and nanosecond mattered. Zero dead code, zero speculative abstractions, zero unused fields/types/wrappers, zero copy-paste duplication. Hot paths stay tight—no needless allocations, no locks held longer than required, no timer leaks, no extra goroutines. Prefer the smallest correct algorithm. Proper error handling with `%w` and sentinels where DESIGN requires it; no log spam (library emits no logs). If a line does not earn its keep under DESIGN + tests, delete it.
+- Waits use select on timer + ctx.Done(); stop timers; defer cancel().
+- Never call user callbacks while holding a lock.
+- Never swallow, convert, or suppress panics. Restore invariants with defer. If recovery is necessary to record a dependency panic, re-panic with the original value. Breaker own-callback panics are never recorded as failures; panics from below the breaker (fn or inner-policy callbacks) are recorded (origin not tracked; see DESIGN).
+- Wrap errors with %w. Never match error strings.
+- Timing tests use testing/synctest. No time.Sleep unless unavoidable.
+- Tests with the code; assert exact counts (calls, tokens, breaker records).
+- Run `go vet ./... && go test -race -count=1 ./...` and show output before saying done.
+- Smallest correct change. No unrelated refactors. No comments that restate code. Exported symbols get godoc.
+- No performance claims without a benchmark.
