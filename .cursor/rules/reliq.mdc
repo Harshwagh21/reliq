@@ -21,3 +21,4 @@ Rules:
 - Run `go vet ./... && go test -race -count=1 ./...` and show output before saying done.
 - Smallest correct change. No unrelated refactors. No comments that restate code. Exported symbols get godoc.
 - No performance claims without a benchmark.
+- Phase workflow: read the Obsidian vault `/Users/harshwagh/Documents/Obsidian-Vault/RELIQ` (tasks, prompts, test plan, decisions) for what the phase is; implement only `docs/DESIGN.md`. When the phase gate is green, write a teaching note in that vault under `Learnings/` (why each file, function, and algorithm; how to read the code). Do not put Learnings in the Go repo.

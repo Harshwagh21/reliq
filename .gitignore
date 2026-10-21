@@ -34,6 +34,3 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
-
-# Local Obsidian planning dump (authoritative docs live under docs/)
-.planning-docs/
