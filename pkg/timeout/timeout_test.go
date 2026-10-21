@@ -138,7 +138,7 @@ func TestIgnoreContextLateSuccess(t *testing.T) {
 		}
 		sawDeadline := false
 		err = chain.Do(context.Background(), func(ctx context.Context) error {
-			synctest.Sleep(d + time.Second)
+			fakeSleep(d + time.Second)
 			sawDeadline = ctx.Err() != nil
 			return nil
 		}, tm.Policy())
@@ -161,7 +161,7 @@ func TestIgnoreContextLateError(t *testing.T) {
 			t.Fatal(err)
 		}
 		err = chain.Do(context.Background(), func(ctx context.Context) error {
-			synctest.Sleep(d + time.Second)
+			fakeSleep(d + time.Second)
 			if ctx.Err() == nil {
 				t.Fatal("deadline did not fire before return")
 			}
@@ -222,6 +222,13 @@ func TestCancelAfterPanic(t *testing.T) {
 		}, tm.Policy())
 		t.Fatal("Do returned")
 	})
+}
+
+// fakeSleep advances the synctest bubble clock by d.
+// synctest.Sleep exists only in Go 1.27; time.Sleep plus Wait is that step on Go 1.26.
+func fakeSleep(d time.Duration) {
+	time.Sleep(d)
+	synctest.Wait()
 }
 
 func runCancelled(t *testing.T, fn chain.Func) (error, error) {
