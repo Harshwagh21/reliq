@@ -4,7 +4,7 @@ How RELIQ behaves around every policy. The binding rules live in [DESIGN.md](DES
 
 ## Construction
 
-`New` validates once and returns `(*T, error)`. Invalid numbers wrap `resilience.ErrInvalidConfig` and name the field. Nil function fields get documented defaults; numeric zeros do not. `Policy()` cannot fail. Config structs are copied at `New`.
+`New` validates once and returns `(*T, error)`. Invalid numbers wrap `chain.ErrInvalidConfig` and name the field. Nil function fields get documented defaults; numeric zeros do not. `Policy()` cannot fail. Config structs are copied at `New`.
 
 ## `Do` and `Get`
 

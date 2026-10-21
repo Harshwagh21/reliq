@@ -1,11 +1,11 @@
 # Policy composition
 
-Policies wrap a `resilience.Func`. `Do` / `Get` take them **outermost first**. The contract is [DESIGN.md — Composition](DESIGN.md#composition). Phase 6 adds the integration walkthrough; this page states the order and why it matters.
+Policies wrap a `chain.Func`. `Do` / `Get` take them **outermost first**. The contract is [DESIGN.md — Composition](DESIGN.md#composition). Phase 6 adds the integration walkthrough; this page states the order and why it matters.
 
 ## Recommended order
 
 ```go
-resilience.Do(ctx, call,
+chain.Do(ctx, call,
     total.Policy(),      // one deadline for attempts and backoff
     retry.Policy(),      // repeats eligible failures
     limiter.Policy(),    // one token per attempt, never refunded

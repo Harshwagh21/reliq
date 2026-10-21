@@ -6,8 +6,8 @@ RELIQ: small stdlib-only Go resilience library. The ONLY spec is docs/DESIGN.md.
 
 Rules:
 - Implement only what DESIGN.md says. No extra features, interfaces, builders, options files, or packages.
-- Layout: pkg/resilience core + one package per policy under pkg/. pkg/resilience never imports policy packages. Docs: markdown under `docs/` (no website app in v0.1). Cursor implements only what `docs/DESIGN.md` says; never invents behavior.
-- Every `New` returns `(X, error)`; invalid config wraps `resilience.ErrInvalidConfig`. Constructors never panic. Runtime panics from dependency functions and user callbacks must propagate unchanged. No `Must` constructors or silent numeric defaults.
+- Layout: pkg/chain core + one package per policy under pkg/. pkg/chain never imports policy packages. Docs: markdown under `docs/` (no website app in v0.1). Cursor implements only what `docs/DESIGN.md` says; never invents behavior.
+- Every `New` returns `(X, error)`; invalid config wraps `chain.ErrInvalidConfig`. Constructors never panic. Runtime panics from dependency functions and user callbacks must propagate unchanged. No `Must` constructors or silent numeric defaults.
 - Stdlib only. Go toolchain 1.27.2, go.mod `go 1.26`: no 1.27-only APIs, no generic methods.
 - No goroutines in library code (tests may use them), no global state, no logging, no metrics.
 - Private helpers: only when DESIGN.md or an ADR explicitly authorizes them, and only under `internal/`. No new public packages or exports for helpers. Panic origin is decided: no helper for classifying panic source (see DESIGN).
@@ -20,5 +20,6 @@ Rules:
 - Tests with the code; assert exact counts (calls, tokens, breaker records).
 - Run `go vet ./... && go test -race -count=1 ./...` and show output before saying done.
 - Smallest correct change. No unrelated refactors. No comments that restate code. Exported symbols get godoc.
+- Every Test function has one comment immediately above it naming the contract case it covers. That comment does not restate the assertions.
 - No performance claims without a benchmark.
 - Phase workflow: read the Obsidian vault `/Users/harshwagh/Documents/Obsidian-Vault/RELIQ` (tasks, prompts, test plan, decisions) for what the phase is; implement only `docs/DESIGN.md`. When the phase gate is green, write a teaching note in that vault under `Learnings/` (why each file, function, and algorithm; how to read the code). Do not put Learnings in the Go repo.

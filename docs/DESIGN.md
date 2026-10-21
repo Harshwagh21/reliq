@@ -67,7 +67,7 @@ The module is a library only: no `cmd/`, `configs/`, or `deployments/`.
 ```
 reliq/                           module: github.com/harshwagh21/reliq
 ├── pkg/
-│   ├── resilience/             policy.go executor.go errors.go doc.go + tests
+│   ├── chain/                  policy.go executor.go errors.go doc.go + tests
 │   ├── retry/                  retry.go backoff.go doc.go + tests
 │   ├── timeout/                timeout.go doc.go + tests
 │   ├── circuitbreaker/         breaker.go state.go doc.go + tests
@@ -90,7 +90,7 @@ reliq/                           module: github.com/harshwagh21/reliq
 
 ### Layout rules
 
-- `pkg/resilience` never imports a policy package. Policy packages import `resilience`.
+- `pkg/chain` never imports a policy package. Policy packages import `chain`.
 - Per-package Go docs are `doc.go` plus `example_test.go`. No per-package README.
 - Create a Go package when its phase starts. No empty Go directories or placeholder `.go` files.
 - v0.1 documentation is the root README, godoc, and markdown under `docs/`. No docs website (Fumadocs/Next or similar) until after v0.1, and only if users ask.
@@ -106,7 +106,7 @@ reliq/                           module: github.com/harshwagh21/reliq
 This is the complete v0.1 export surface. Nothing else is exported. Adding an export needs a decision (ADR) first.
 
 ```go
-// pkg/resilience
+// pkg/chain
 type Func   func(ctx context.Context) error
 type Policy func(next Func) Func
 func Do(ctx context.Context, fn Func, policies ...Policy) error
@@ -123,7 +123,7 @@ var (
 
 // pkg/timeout
 func New(d time.Duration) (*Timeout, error)
-func (t *Timeout) Policy() resilience.Policy
+func (t *Timeout) Policy() chain.Policy
 
 // pkg/retry
 type Config struct {
@@ -133,7 +133,7 @@ type Config struct {
     OnRetry   func(attempt int, err error, delay time.Duration) // nil = none
 }
 func New(c Config) (*Retry, error)
-func (r *Retry) Policy() resilience.Policy
+func (r *Retry) Policy() chain.Policy
 
 // pkg/circuitbreaker
 type State int
@@ -152,16 +152,16 @@ type Config struct {
     OnStateChange    func(from, to State)      // nil = none
 }
 func New(c Config) (*Breaker, error)
-func (b *Breaker) Policy() resilience.Policy
+func (b *Breaker) Policy() chain.Policy
 func (b *Breaker) State() State
 
 // pkg/bulkhead
 func New(maxConcurrent int) (*Bulkhead, error)
-func (b *Bulkhead) Policy() resilience.Policy
+func (b *Bulkhead) Policy() chain.Policy
 
 // pkg/ratelimit
 func New(ratePerSecond float64, burst int) (*Limiter, error)
-func (l *Limiter) Policy() resilience.Policy
+func (l *Limiter) Policy() chain.Policy
 ```
 
 
@@ -320,7 +320,7 @@ Consecutive-failure model. States: Closed, Open, HalfOpen.
 `Do` / `Get` apply policies **outermost first** (first argument wraps everything inside it).
 
 ```go
-resilience.Do(ctx, call,
+chain.Do(ctx, call,
     total.Policy(),      // timeout: one deadline for everything including backoff
     retry.Policy(),      // repeats eligible failures
     limiter.Policy(),    // each attempt consumes a token
