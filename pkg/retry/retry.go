@@ -8,7 +8,7 @@ import (
 
 	"github.com/harshwagh21/reliq/pkg/chain"
 )
-	
+
 // Config is the retry configuration copied by [New].
 // Later changes to the caller's value have no effect.
 type Config struct {
