@@ -18,6 +18,6 @@ var ErrBulkheadFull = errors.New("chain: bulkhead full")
 // ErrRateLimited is returned when a rate limiter has no token left.
 var ErrRateLimited = errors.New("chain: rate limited")
 
-// ErrRetriesExhausted is wrapped around the last attempt error when retry
-// has used every attempt.
+// ErrRetriesExhausted is wrapped around the last attempt error when every
+// attempt failed and was retryable. A non-retryable error is returned as-is.
 var ErrRetriesExhausted = errors.New("chain: retries exhausted")

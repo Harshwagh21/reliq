@@ -80,7 +80,7 @@ reliq/                           module: github.com/harshwagh21/reliq
 ├── docs/
 │   ├── DESIGN.md               this file — implementation contract
 │   ├── adr/                    architecture decision records
-│   └── semantics.md  policy-composition.md  benchmarks.md  faq.md
+│   └── guide.md  reference.md  semantics.md  policy-composition.md  benchmarks.md  faq.md
 ├── .github/                    workflows/ci.yml ISSUE_TEMPLATE/ PULL_REQUEST_TEMPLATE.md dependabot.yml
 ├── .golangci.yml .editorconfig .gitignore
 ├── CHANGELOG.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md LICENSE README.md Makefile go.mod

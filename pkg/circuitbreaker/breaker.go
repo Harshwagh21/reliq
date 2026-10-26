@@ -95,9 +95,12 @@ func (b *Breaker) State() State {
 // remember the generation at admission; a mismatch at completion drops the
 // result. A nil error is success. An error that matches the done context is
 // neutral. Otherwise IsFailure decides.
-// A panic or runtime.Goexit from next counts as a failure, and the panic value
-// propagates. A panic from IsFailure or OnStateChange propagates and is not a
-// failure. OnStateChange runs after the lock is released.
+// A panic from next counts as a failure, including a callback of a policy
+// inside next. Origin beneath the breaker is not tracked, and the original
+// panic value propagates. runtime.Goexit from next counts as a failure and the
+// goroutine keeps exiting. A panic from IsFailure or OnStateChange propagates
+// and is not a failure. A held probe slot is released. OnStateChange runs
+// after the lock is released.
 func (b *Breaker) Policy() chain.Policy {
 	return func(next chain.Func) chain.Func {
 		return func(ctx context.Context) error {

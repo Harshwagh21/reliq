@@ -50,6 +50,7 @@ type Retry struct {
 // [chain.ErrInvalidConfig] that names the field.
 // A nil Retryable retries any error except context.Canceled,
 // [chain.ErrCircuitOpen], [chain.ErrBulkheadFull], and [chain.ErrRateLimited].
+// context.DeadlineExceeded is retried while this policy's context is still live.
 func New(c Config) (*Retry, error) {
 	if c.MaxAttempts < 1 {
 		return nil, fmt.Errorf("retry: MaxAttempts: %w", chain.ErrInvalidConfig)

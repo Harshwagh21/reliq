@@ -14,8 +14,8 @@ const (
 	StateHalfOpen
 )
 
-// String returns Closed, Open, or HalfOpen.
-// Any other value is State(n). State(99) is "State(99)".
+// String returns "Closed", "Open", or "HalfOpen".
+// Any other value is "State(<n>)". State(99) is "State(99)".
 func (s State) String() string {
 	switch s {
 	case StateClosed:
