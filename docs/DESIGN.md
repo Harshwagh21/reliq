@@ -50,7 +50,7 @@ It is a small, readable core with one API style. failsafe-go already covers this
 
 ## 2. Go version
 
-- Local and CI toolchain: **Go 1.27.2**.
+- Local and CI toolchain: the latest Go 1.26 and Go 1.27 patches. CI selects `1.26.x` and `1.27.x` with `check-latest`. Go 1.26.10 and Go 1.27.3 are the oldest patches that include the `crypto/x509` fix GO-2026-6809.
 - `go.mod` language version: `go 1.26`. Raise it only when a 1.27 feature is genuinely required.
 - `go test` on 1.27 runs the `stdversion` vet check, so 1.27-only stdlib APIs cannot sneak in.
 - No generic methods in v0.1. `Get[T]` stays a package-level function.

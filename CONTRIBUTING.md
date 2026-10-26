@@ -4,7 +4,7 @@ Thanks for helping with RELIQ.
 
 ## Requirements
 
-- Go **1.26+** in `go.mod` (`go 1.26`); local/CI toolchain **1.27.2** preferred
+- Go **1.26+** in `go.mod` (`go 1.26`). CI installs the latest 1.26 and 1.27 patches, at least 1.26.10 and 1.27.3.
 - No third-party library dependencies in the module
 
 ## Setup
