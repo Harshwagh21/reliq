@@ -1,3 +1,4 @@
+// Package main retries a call that fails once, then succeeds.
 package main
 
 import (

@@ -1,3 +1,4 @@
+// Package main performs an HTTP call with a timeout.
 package main
 
 import (

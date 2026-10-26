@@ -1,3 +1,4 @@
+// Package main opens a circuit on the first failure and rejects the next call.
 package main
 
 import (

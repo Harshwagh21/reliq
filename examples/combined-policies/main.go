@@ -1,3 +1,4 @@
+// Package main performs an HTTP call with timeout, retry, rate limit, breaker, and bulkhead.
 package main
 
 import (
