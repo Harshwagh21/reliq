@@ -56,7 +56,7 @@ The default predicate retries `context.DeadlineExceeded` while the retry's own c
 
 The breaker counts consecutive failures. At `FailureThreshold` it opens. While it is open, `Do` returns `chain.ErrCircuitOpen` and does not call the function. After `OpenTimeout`, the next call is one probe. Success closes the breaker. Failure opens it again.
 
-A nil error is success. An error that matches the breaker's own done context is neutral: caller cancel, or an outer deadline, records nothing. A deadline from a timeout placed inside the breaker counts as a failure.
+A nil error is success. An error that matches the breaker's own done context is neutral: caller cancel, or an outer deadline, records nothing. `DeadlineExceeded` is also neutral once the breaker's own deadline has been reached, so two deadlines that expire together record nothing. A shorter deadline from a timeout placed inside the breaker counts as a failure.
 
 [examples/circuitbreaker](../examples/circuitbreaker/main.go) uses a threshold of 1, so the second call is rejected while `OpenTimeout` is still in the future.
 

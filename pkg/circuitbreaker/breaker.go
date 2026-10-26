@@ -94,7 +94,9 @@ func (b *Breaker) State() State {
 // After OpenTimeout, the next call is one half-open probe. Admitted calls
 // remember the generation at admission; a mismatch at completion drops the
 // result. A nil error is success. An error that matches the done context is
-// neutral. Otherwise IsFailure decides.
+// neutral. DeadlineExceeded is also neutral once this context's deadline
+// has been reached, so two deadlines that expire together stay neutral.
+// Otherwise IsFailure decides.
 // A panic from next counts as a failure, including a callback of a policy
 // inside next. Origin beneath the breaker is not tracked, and the original
 // panic value propagates. runtime.Goexit from next counts as a failure and the
@@ -176,7 +178,10 @@ func (b *Breaker) classify(ctx context.Context, err error) outcome {
 	if err == nil {
 		return outcomeSuccess
 	}
-	if ctx.Err() != nil && errors.Is(err, ctx.Err()) {
+	if ctxErr := ctx.Err(); ctxErr != nil && errors.Is(err, ctxErr) {
+		return outcomeNeutral
+	}
+	if deadline, ok := ctx.Deadline(); ok && !time.Now().Before(deadline) && errors.Is(err, context.DeadlineExceeded) {
 		return outcomeNeutral
 	}
 	if b.isFailure(err) {

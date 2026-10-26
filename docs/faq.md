@@ -34,7 +34,7 @@ Answers that follow from [DESIGN.md](DESIGN.md). This page is not a second contr
 
 [DESIGN.md — Circuit breaker](DESIGN.md#circuit-breaker). Classification checks a nil error first, then whether the error matches the breaker's own done context. That second case is neutral: caller cancel, or an outer timeout whose context is the one the breaker received. Nothing is recorded. `IsFailure` is not called.
 
-A per-attempt timeout placed inside the breaker has a different context. Its `DeadlineExceeded` does not match the breaker's context, so the default `IsFailure` counts it.
+A per-attempt timeout placed inside the breaker has a different context. Its `DeadlineExceeded` does not match the breaker's context, so the default `IsFailure` counts it while the breaker's own deadline is still in the future. When the two deadlines are reached together, the outcome stays neutral.
 
 ## Why does `Get` return a zero value on error?
 

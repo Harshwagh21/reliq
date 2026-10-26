@@ -7,9 +7,11 @@
 // unless it is context.Canceled. A nil OnStateChange is not called.
 //
 // A nil error is success, including a late success after the breaker's context
-// is already done. An error that matches that done context is neutral: nothing
-// is recorded, and IsFailure is not called. Any other error is classified by
-// IsFailure. A deadline from a per-attempt timeout below the breaker counts as
-// a failure. The breaker does not start a goroutine. OpenTimeout is checked on
+// is already done. An error that matches that done context is neutral.
+// DeadlineExceeded is also neutral once the breaker's own deadline has been
+// reached, so two deadlines that expire together record nothing. IsFailure is
+// not called for a neutral outcome. Any other error is classified by IsFailure.
+// A deadline from a shorter per-attempt timeout below the breaker counts as a
+// failure. The breaker does not start a goroutine. OpenTimeout is checked on
 // the next call.
 package circuitbreaker
